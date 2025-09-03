@@ -78,10 +78,7 @@ Loterias/
 
 ## ⚡ Como Usar
 
-1. Clone o repositório:
-```bash
-git clone https://github.com/seuusuario/loterias-ml.git
-cd loterias-ml
+
 
 
 🌟 Resultado Esperado
