@@ -1,0 +1,5 @@
+timestamp,modelo,precision,recall,f1,roc_auc
+2025-09-03 14:56:37,RandomForest,1.0,1.0,1.0,1.0
+2025-09-03 14:56:38,XGBoost,1.0,1.0,1.0,1.0
+2025-09-03 15:02:49,RandomForest,1.0,1.0,1.0,1.0
+2025-09-03 15:02:50,XGBoost,1.0,1.0,1.0,1.0
