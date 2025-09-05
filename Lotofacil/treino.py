@@ -15,7 +15,7 @@ import joblib
 # ================================
 # 📂 Carregar dados
 # ================================
-ARQUIVO_TREINO = "mega_sena.xlsx"
+ARQUIVO_TREINO = "treino.xlsx"
 df = pd.read_excel(ARQUIVO_TREINO)
 
 # Filtrar apenas números válidos (1 a 25)
