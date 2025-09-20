@@ -47,21 +47,23 @@ O objetivo é **explorar padrões históricos e gerar previsões com base em pro
 
 ## 🗂 Estrutura do Repositório
 
-Loterias/
+<pre>
+📂 <span style="color:#4CAF50"><b>Loterias/</b></span>
 │
-├── Lotofacil/
-│ ├── treino.py # Script principal da Lotofácil
-│ ├── treino.xlsx # Base de dados da Lotofácil
-│ └── modelo_lotofacil.pkl
+├── 📂 <span style="color:#4CAF50"><b>Lotofacil/</b></span>
+│   ├── 📄 <span style="color:#2196F3">treino.py</span>              # Script principal da Lotofácil
+│   ├── 📄 <span style="color:#2196F3">treino.xlsx</span>            # Base de dados da Lotofácil
+│   └── 📄 <span style="color:#2196F3">modelo_lotofacil.pkl</span>   # Modelo treinado Lotofácil
 │
-├── Mega_Sena/
-│ ├── treino.py # Script principal da Mega-Sena
-│ ├── mega_sena.xlsx # Base de dados da Mega-Sena
-│ └── modelo_xgb.pkl
+├── 📂 <span style="color:#4CAF50"><b>Mega_Sena/</b></span>
+│   ├── 📄 <span style="color:#2196F3">treino.py</span>              # Script principal da Mega-Sena
+│   ├── 📄 <span style="color:#2196F3">mega_sena.xlsx</span>         # Base de dados da Mega-Sena
+│   └── 📄 <span style="color:#2196F3">modelo_xgb.pkl</span>         # Modelo treinado Mega-Sena
 │
-├── docs/ # Screenshots, GIFs, imagens de demonstração
-├── requirements.txt # Bibliotecas necessárias
-└── README.md # Este arquivo
+├── 📂 <span style="color:#4CAF50"><b>docs/</b></span>                      # Screenshots, GIFs, imagens de demonstração
+├── 📄 <span style="color:#2196F3">requirements.txt</span>           # Bibliotecas necessárias
+└── 📄 <span style="color:#2196F3">README.md</span>                  # Este arquivo
+</pre>
 
 
 ---
