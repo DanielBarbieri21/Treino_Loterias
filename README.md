@@ -92,3 +92,18 @@ O objetivo é **explorar padrões históricos e gerar previsões com base em pro
 ✅ Métricas detalhadas de performance dos modelos
 
 ✅ Interface moderna e intuitiva via Streamlit
+
+
+
+---
+
+🛠️ **Software desenvolvido por Daniel Barbieri**  
+Engenheiro de Software | Full Stack Developer  
+
+Código construído com foco em eficiência, organização, escalabilidade e boas práticas de desenvolvimento.
+
+🌐 GitHub: https://github.com/DanielBarbieri21  
+💼 LinkedIn: https://www.linkedin.com/in/daniel-barbieri-4990462a/
+
+---
+
