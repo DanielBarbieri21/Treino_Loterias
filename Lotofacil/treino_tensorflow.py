@@ -61,51 +61,55 @@ from tensorflow_model import (
 
 def criar_features_sklearn(binario: np.ndarray, window: int = WINDOW) -> np.ndarray:
     """
-    Gera features tabulares a partir do histórico binário.
-    Uma linha por sorteio (a partir do índice `window`).
-
-    Features por número (1-25):
-      - freq_5, freq_10, freq_20, freq_50  : frequência nas últimas N linhas
-      - gap                                 : quantos sorteios desde a última aparição
-      - decay (α=0.08)                      : frequência com decaimento exponencial
-    Mais:
-      - soma_bin                            : total de 1s no último sorteio
-      - qtd_pares_ant, qtd_impares_ant      : par/ímpar do sorteio anterior
+    Gera features tabulares a partir do historico binario de forma ultra-rapida e vetorizada.
     """
     N, F = binario.shape
-    alpha = 0.08
+    df_bin = pd.DataFrame(binario)
 
-    rows = []
-    for i in range(window, N):
-        past = binario[:i]
-        feat = []
+    # Rolling means
+    f5 = df_bin.shift(1).rolling(5, min_periods=1).mean().fillna(0).values
+    f10 = df_bin.shift(1).rolling(10, min_periods=1).mean().fillna(0).values
+    f20 = df_bin.shift(1).rolling(20, min_periods=1).mean().fillna(0).values
+    f50 = df_bin.shift(1).rolling(50, min_periods=1).mean().fillna(0).values
+    
+    # Exponential decay
+    decay = df_bin.shift(1).ewm(alpha=0.08, adjust=False).mean().fillna(0).values
 
-        for num_idx in range(F):
-            col = past[:, num_idx]
-            # Frequências rolling
-            for w in (5, 10, 20, 50):
-                feat.append(float(col[-w:].mean()) if len(col) >= w else float(col.mean()))
+    # Gaps ultra-rapido
+    gaps = np.zeros((N, F), dtype=np.float32)
+    last_seen = np.full(F, -1, dtype=int)
+    for i in range(N):
+        for j in range(F):
+            gaps[i, j] = float(i - last_seen[j] - 1) if last_seen[j] != -1 else float(i)
+            if binario[i, j] == 1:
+                last_seen[j] = i
 
-            # Gap desde última aparição
-            positions = np.where(col == 1)[0]
-            gap = float(i - positions[-1] - 1) if len(positions) else float(i)
-            feat.append(gap)
+    gaps_shifted = np.roll(gaps, 1, axis=0)
+    gaps_shifted[0] = 0.0
 
-            # Decay exponencial
-            decay_val = 0.0
-            for bit in col:
-                decay_val = (1 - alpha) * decay_val + alpha * float(bit)
-            feat.append(decay_val)
+    # Contexto
+    soma = df_bin.shift(1).sum(axis=1).fillna(15).values[:, None]
+    pares_mask = [(j + 1) % 2 == 0 for j in range(F)]
+    impares_mask = [(j + 1) % 2 != 0 for j in range(F)]
+    pares = df_bin.shift(1).iloc[:, pares_mask].sum(axis=1).fillna(7).values[:, None]
+    impares = df_bin.shift(1).iloc[:, impares_mask].sum(axis=1).fillna(8).values[:, None]
 
-        # Contexto do último sorteio
-        last = past[-1]
-        feat.append(float(last.sum()))                          # soma
-        feat.append(float(sum(1 for j in range(F) if (j+1) % 2 == 0 and last[j] == 1)))  # pares
-        feat.append(float(sum(1 for j in range(F) if (j+1) % 2 != 0 and last[j] == 1)))  # ímpares
+    # Concatenar todas as features por coluna
+    # Para cada numero (F=25): f5, f10, f20, f50, gap, decay -> 6 features * 25 = 150 features
+    partes = []
+    for j in range(F):
+        partes.extend([
+            f5[:, j:j+1],
+            f10[:, j:j+1],
+            f20[:, j:j+1],
+            f50[:, j:j+1],
+            gaps_shifted[:, j:j+1],
+            decay[:, j:j+1],
+        ])
+    partes.extend([soma, pares, impares])
 
-        rows.append(feat)
-
-    return np.array(rows, dtype=np.float32)
+    todas_features = np.hstack(partes).astype(np.float32)
+    return todas_features[window:]
 
 
 # ──────────────────────────────────────────────────────────────
@@ -128,17 +132,17 @@ def treinar_xgboost(
     X_train, y_train = X[:split], y[:split]
 
     xgb = XGBClassifier(
-        n_estimators=300,
-        max_depth=5,
-        learning_rate=0.05,
-        subsample=0.8,
-        colsample_bytree=0.8,
+        n_estimators=100,
+        max_depth=4,
+        learning_rate=0.08,
+        subsample=0.85,
+        colsample_bytree=0.85,
         eval_metric="logloss",
         random_state=42,
-        n_jobs=-1,
+        n_jobs=1,
         verbosity=0,
     )
-    model = MultiOutputClassifier(xgb, n_jobs=-1)
+    model = MultiOutputClassifier(xgb, n_jobs=4)
     model.fit(X_train, y_train)
 
     return model, X, y
